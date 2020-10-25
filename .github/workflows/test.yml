@@ -1,0 +1,21 @@
+on: push
+
+name: Test builds
+
+jobs:
+  build_win_cuda11_0:
+    name: Windows CUDA 11.0
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Install CUDA
+        run: |
+          powershell -Command "Invoke-WebRequest http://developer.download.nvidia.com/compute/cuda/11.0.1/network_installers/cuda_11.0.1_win10_network.exe -OutFile .\cuda_setup.exe"
+          start /wait .\cuda_setup.exe -s nvcc_11.0 cudart_11.0 nvrtc_11.0 nvrtc_dev_11.0 nvml_dev_11.0
+        shell: cmd
+      - name: Build project on Windows
+        run: |
+          cmake . -G "Visual Studio 16 2019" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.0"
+          cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
+          .\MSBuild.exe /p:Configuration=Release $Env:GITHUB_WORKSPACE\xmrig-cuda.sln
