@@ -34,7 +34,7 @@ __global__ void find_shares(const void* hashes, uint64_t target, uint32_t* share
 
 void hash(nvid_ctx *ctx, uint32_t nonce, uint64_t target, uint32_t *rescount, uint32_t *resnonce, uint32_t batch_size)
 {
-    if (ctx->algorithm.id() == xmrig::Algorithm::RX_DEFYX) {
+    if (ctx->algorithm.id() == xmrig_cuda::Algorithm::RX_DEFYX) {
 //        sipesh(tempHash, sizeof(tempHash), input, inputSize, input, inputSize, 0, 0);
 //        CUDA_CHECK_KERNEL(ctx->device_id, sipesh<<<batch_size / 32, 32>>>(ctx->d_rx_hashes, ctx->d_input, ctx->inputlen, nonce));
 //        k12(input, inputSize, tempHash);

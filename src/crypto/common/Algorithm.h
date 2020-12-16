@@ -31,7 +31,7 @@
 #include <vector>
 
 
-namespace xmrig {
+namespace xmrig_cuda {
 
 
 class Algorithm
@@ -267,7 +267,7 @@ private:
 };
 
 
-} /* namespace xmrig */
+} /* namespace xmrig_cuda */
 
 
 #endif /* XMRIG_ALGORITHM_H */
