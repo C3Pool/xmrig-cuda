@@ -6,6 +6,31 @@ on:
 name: Create release and build artifacts
 
 jobs:
+  build_win_cuda11_1:
+    name: Windows CUDA 11.1
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Install CUDA
+        run: |
+          powershell -Command "Invoke-WebRequest http://developer.download.nvidia.com/compute/cuda/11.1.0/network_installers/cuda_11.1.0_win10_network.exe -OutFile .\cuda_setup.exe"
+          start /wait .\cuda_setup.exe -s nvcc_11.1 cudart_11.1 nvrtc_11.1 nvrtc_dev_11.1 nvml_dev_11.1
+        shell: cmd
+      - name: Build project on Windows
+        run: |
+          cmake . -G "Visual Studio 16 2019" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.1"
+          cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
+          .\MSBuild.exe /p:Configuration=Release $Env:GITHUB_WORKSPACE\xmrig-cuda.sln
+          cd $Env:GITHUB_WORKSPACE
+          copy Release\*.dll .
+          7z a -tzip -mx cuda11_1.zip *.dll
+      - name: Upload Windows build artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: cuda11_1
+          path: cuda11_1.zip
+
   build_win_cuda11_0:
     name: Windows CUDA 11.0
     runs-on: windows-latest
