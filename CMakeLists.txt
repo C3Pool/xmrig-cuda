@@ -11,6 +11,7 @@ option(WITH_CN_LITE    "Enable CryptoNight-Lite algorithms family" ON)
 option(WITH_CN_HEAVY   "Enable CryptoNight-Heavy algorithms family" ON)
 option(WITH_CN_PICO    "Enable CryptoNight-Pico algorithm" ON)
 option(WITH_CN_GPU     "Enable CryptoNight-GPU algorithm" ON)
+option(WITH_CN_FEMTO   "Enable CryptoNight-UPX2 algorithm" ON)
 option(WITH_ARGON2     "Enable Argon2 algorithms family" OFF) #unsupported
 
 if (CUDA_VERSION VERSION_LESS 9.0)
@@ -38,6 +39,10 @@ endif()
 
 if (WITH_CN_GPU)
     add_definitions(/DXMRIG_ALGO_CN_GPU)
+endif()
+
+if (WITH_CN_FEMTO)
+    add_definitions(/DXMRIG_ALGO_CN_FEMTO)
 endif()
 
 if (WITH_RANDOMX)
