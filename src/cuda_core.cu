@@ -837,7 +837,7 @@ void cryptonight_core_gpu_hash_gpu(nvid_ctx* ctx, uint32_t nonce)
 
     CUDA_CHECK_KERNEL(
         ctx->device_id,
-        xmrig::cn_gpu::cn_explode_gpu<MEMORY><<<intensity,32>>>((int*)ctx->d_ctx_state, (int*)ctx->d_long_state)
+        xmrig_cuda::cn_gpu::cn_explode_gpu<MEMORY><<<intensity,32>>>((int*)ctx->d_ctx_state, (int*)ctx->d_long_state)
     );
 
     int partcount = 1 << ctx->device_bfactor;
@@ -846,7 +846,7 @@ void cryptonight_core_gpu_hash_gpu(nvid_ctx* ctx, uint32_t nonce)
         CUDA_CHECK_KERNEL(
             ctx->device_id,
             // 36 x 16byte x numThreads
-            xmrig::cn_gpu::cryptonight_core_gpu_phase2_gpu<ITERATIONS, MEMORY>
+            xmrig_cuda::cn_gpu::cryptonight_core_gpu_phase2_gpu<ITERATIONS, MEMORY>
                 <<<ctx->device_blocks, ctx->device_threads * 16,  36 * 16 * ctx->device_threads>>>
                 (
                     (int*)ctx->d_ctx_state,

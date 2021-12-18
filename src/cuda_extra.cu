@@ -289,48 +289,50 @@ __global__ void cryptonight_extra_gpu_final( int threads, uint64_t target, uint3
 template<xmrig_cuda::Algorithm::Id ALGO>
 __global__ void cryptonight_gpu_extra_gpu_final( int threads, uint64_t target, uint32_t* __restrict__ d_res_count, uint32_t * __restrict__ d_res_nonce, uint32_t * __restrict__ d_ctx_state,uint32_t * __restrict__ d_ctx_key2 )
 {
-	const int thread = blockDim.x * blockIdx.x + threadIdx.x;
+    using namespace xmrig_cuda;
 
-	__shared__ uint32_t sharedMemory[1024];
+    const int thread = blockDim.x * blockIdx.x + threadIdx.x;
 
-	cn_aes_gpu_init( sharedMemory );
-	__syncthreads( );
+    __shared__ uint32_t sharedMemory[1024];
 
-	if ( thread >= threads )
-		return;
+    cn_aes_gpu_init( sharedMemory );
+    __syncthreads( );
 
-	int i;
-	uint32_t * __restrict__ ctx_state = d_ctx_state + thread * 50;
-	uint32_t state[50];
+    if ( thread >= threads )
+        return;
 
-	#pragma unroll
-	for ( i = 0; i < 50; i++ )
-		state[i] = ctx_state[i];
+    int i;
+    uint32_t * __restrict__ ctx_state = d_ctx_state + thread * 50;
+    uint32_t state[50];
 
-	uint32_t key[40];
+    #pragma unroll
+    for ( i = 0; i < 50; i++ )
+        state[i] = ctx_state[i];
 
-	// load keys
-	MEMCPY8( key, d_ctx_key2 + thread * 40, 20 );
+    uint32_t key[40];
 
-	for(int i=0; i < 16; i++)
-	{
-		for(size_t t = 4; t < 12; ++t)
-		{
-			cn_aes_pseudo_round_mut( sharedMemory, state + 4u * t, key );
-		}
-		// scipt first 4 * 128bit blocks = 4 * 4 uint32_t values
-		mix_and_propagate(state + 4 * 4);
-	}
+    // load keys
+    MEMCPY8( key, d_ctx_key2 + thread * 40, 20 );
 
-	cn_keccakf2( (uint64_t *) state );
+    for(int i=0; i < 16; i++)
+    {
+        for(size_t t = 4; t < 12; ++t)
+        {
+            cn_aes_pseudo_round_mut( sharedMemory, state + 4u * t, key );
+        }
+        // scipt first 4 * 128bit blocks = 4 * 4 uint32_t values
+        mix_and_propagate(state + 4 * 4);
+    }
 
-	if ( ((uint64_t*)state)[3] < target )
-	{
-		uint32_t idx = atomicInc( d_res_count, 0xFFFFFFFF );
+    cn_keccakf2( (uint64_t *) state );
 
-		if(idx < 10)
-			d_res_nonce[idx] = thread;
-	}
+    if ( ((uint64_t*)state)[3] < target )
+    {
+        uint32_t idx = atomicInc( d_res_count, 0xFFFFFFFF );
+
+        if(idx < 10)
+            d_res_nonce[idx] = thread;
+    }
 }
 
 void cryptonight_extra_cpu_set_data(nvid_ctx *ctx, const void *data, size_t len)
@@ -421,7 +423,7 @@ int cryptonight_extra_cpu_init(nvid_ctx *ctx, const xmrig_cuda::Algorithm &algor
     CUDA_CHECK(ctx->device_id, cudaMalloc(&ctx->d_result_nonce, 16 * sizeof (uint32_t)));
 
     // Allocate buffers for Cryptonight
-    if (hashMemSize) {
+    if (hashMemSize && algorithm.isCN()) {
         CUDA_CHECK(ctx->device_id, cudaMalloc(&ctx->d_ctx_key1, 40 * sizeof(uint32_t) * wsize));
         CUDA_CHECK(ctx->device_id, cudaMalloc(&ctx->d_ctx_key2, 40 * sizeof(uint32_t) * wsize));
         CUDA_CHECK(ctx->device_id, cudaMalloc(&ctx->d_ctx_text, 32 * sizeof(uint32_t) * wsize));
@@ -725,6 +727,23 @@ int cuda_get_deviceinfo(nvid_ctx *ctx)
             if (blockOptimal * threads * hashMemSize < limitedMemory) {
                 ctx->device_threads = threads;
                 ctx->device_blocks = blockOptimal;
+            }
+        }
+
+        if (ctx->algorithm == Algorithm::CN_GPU && props.major < 7) {
+            int t = 32;
+            int b = ctx->device_blocks;
+            int target_intensity = ctx->device_threads * b;
+            for (; t * b <= target_intensity; b++) {}
+            b--;
+            if (t != ctx->device_threads || b != ctx->device_blocks) {
+                printf("WARNING: NVIDIA GPU %d: modified cn/gpu t/b from %d/%d to %d/%d\n",
+                    ctx->device_id,
+                    ctx->device_threads, ctx->device_blocks,
+                    t, b
+                );
+                ctx->device_threads = t;
+                ctx->device_blocks = b;
             }
         }
 
