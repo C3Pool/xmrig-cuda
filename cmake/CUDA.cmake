@@ -24,7 +24,7 @@ endif()
 # Kepler GPUs are only supported with CUDA < 11.0
 if (CUDA_VERSION VERSION_LESS 11.0)
     list(APPEND DEFAULT_CUDA_ARCH "30")
-else()
+elseif (CUDA_VERSION VERSION_LESS 12.0)
     list(APPEND DEFAULT_CUDA_ARCH "35")
 endif()
 
@@ -46,6 +46,19 @@ endif()
 # add Ampere support for CUDA >= 11.0
 if (NOT CUDA_VERSION VERSION_LESS 11.0)
     list(APPEND DEFAULT_CUDA_ARCH "80")
+endif()
+
+if (NOT CUDA_VERSION VERSION_LESS 11.1)
+    list(APPEND DEFAULT_CUDA_ARCH "86")
+endif()
+
+if (NOT CUDA_VERSION VERSION_LESS 11.5)
+    list(APPEND DEFAULT_CUDA_ARCH "87")
+endif()
+
+if (NOT CUDA_VERSION VERSION_LESS 11.8)
+    list(APPEND DEFAULT_CUDA_ARCH "89")
+    list(APPEND DEFAULT_CUDA_ARCH "90")
 endif()
 list(SORT DEFAULT_CUDA_ARCH)
 
@@ -167,6 +180,10 @@ elseif("${CUDA_COMPILER}" STREQUAL "nvcc")
 
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-Wno-deprecated-gpu-targets")
 
+    if (NOT CUDA_VERSION VERSION_LESS 11.3)
+        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "--threads 0")
+    endif()
+
     foreach(CUDA_ARCH_ELEM ${CUDA_ARCH})
         # set flags to create device code for the given architecture
         if("${CUDA_ARCH_ELEM}" STREQUAL "21")
@@ -220,20 +237,11 @@ if (WITH_RANDOMX)
         src/RandomX/randomx.cu
         src/RandomX/wownero/configuration.h
         src/RandomX/wownero/randomx_wownero.cu
+        src/RandomX/yada/configuration.h
+        src/RandomX/yada/randomx_yada.cu
     )
 else()
     set(CUDA_RANDOMX_SOURCES "")
-endif()
-
-if (WITH_ASTROBWT)
-    set(CUDA_ASTROBWT_SOURCES
-        src/AstroBWT/dero/AstroBWT.cu
-        src/AstroBWT/dero/BWT.h
-        src/AstroBWT/dero/salsa20.h
-        src/AstroBWT/dero/sha3.h
-    )
-else()
-    set(CUDA_ASTROBWT_SOURCES "")
 endif()
 
 if (WITH_KAWPOW AND WITH_DRIVER_API)
@@ -260,7 +268,6 @@ set(CUDA_SOURCES
     src/cuda_keccak.hpp
     src/cuda_skein.hpp
     ${CUDA_RANDOMX_SOURCES}
-    ${CUDA_ASTROBWT_SOURCES}
     ${CUDA_KAWPOW_SOURCES}
 )
 

@@ -185,19 +185,23 @@ bool rxHash(nvid_ctx *ctx, uint32_t startNonce, uint64_t target, uint32_t *resco
         switch (ctx->algorithm.id()) {
         case Algorithm::RX_0:
         case Algorithm::RX_SFX:
-            RandomX_Monero::hash(ctx, startNonce, target, rescount, resnonce, ctx->rx_batch_size);
+            RandomX_Monero::hash(ctx, startNonce, 39, target, rescount, resnonce, ctx->rx_batch_size);
             break;
 
         case Algorithm::RX_WOW:
-            RandomX_Wownero::hash(ctx, startNonce, target, rescount, resnonce, ctx->rx_batch_size);
+            RandomX_Wownero::hash(ctx, startNonce, 39, target, rescount, resnonce, ctx->rx_batch_size);
             break;
 
         case Algorithm::RX_ARQ:
-            RandomX_Arqma::hash(ctx, startNonce, target, rescount, resnonce, ctx->rx_batch_size);
+            RandomX_Arqma::hash(ctx, startNonce, 39, target, rescount, resnonce, ctx->rx_batch_size);
             break;
 
         case Algorithm::RX_KEVA:
-            RandomX_Keva::hash(ctx, startNonce, target, rescount, resnonce, ctx->rx_batch_size);
+            RandomX_Keva::hash(ctx, startNonce, 39, target, rescount, resnonce, ctx->rx_batch_size);
+            break;
+
+        case Algorithm::RX_YADA:
+            RandomX_Yada::hash(ctx, startNonce, 147, target, rescount, resnonce, ctx->rx_batch_size);
             break;
 
         case Algorithm::RX_XLA:
@@ -205,7 +209,7 @@ bool rxHash(nvid_ctx *ctx, uint32_t startNonce, uint64_t target, uint32_t *resco
             //RandomX_DefyX::hash(ctx, startNonce, target, rescount, resnonce, ctx->rx_batch_size);
 
         case Algorithm::RX_GRAFT:
-            RandomX_Graft::hash(ctx, startNonce, target, rescount, resnonce, ctx->rx_batch_size);
+            RandomX_Graft::hash(ctx, startNonce, 39, target, rescount, resnonce, ctx->rx_batch_size);
             break;
 
         default:
@@ -233,59 +237,6 @@ bool rxPrepare(nvid_ctx *ctx, const void *dataset, size_t datasetSize, bool, uin
     try {
 #       ifdef XMRIG_ALGO_RANDOMX
         randomx_prepare(ctx, ctx->rx_dataset_host > 0 ? datasetHost.reg(dataset, datasetSize) : dataset, datasetSize, batchSize);
-#       else
-        throw std::runtime_error(kUnsupportedAlgorithm);
-#       endif
-    }
-    catch (std::exception &ex) {
-        return saveError(ctx->device_id, ex);
-    }
-
-    return true;
-#   else
-    return saveError(ctx->device_id, kUnsupportedAlgorithm);
-#   endif
-}
-
-
-bool astroBWTHash(nvid_ctx *ctx, uint32_t startNonce, uint64_t target, uint32_t *rescount, uint32_t *resnonce)
-{
-    using namespace xmrig_cuda;
-
-#   ifdef XMRIG_ALGO_ASTROBWT
-    resetError(ctx->device_id);
-
-    try {
-        switch (ctx->algorithm.id()) {
-        case Algorithm::ASTROBWT_DERO:
-            AstroBWT_Dero::hash(ctx, startNonce, target, rescount, resnonce);
-            break;
-
-        default:
-            throw std::runtime_error(kUnsupportedAlgorithm);
-        }
-    }
-    catch (std::exception &ex) {
-        return saveError(ctx->device_id, ex);
-    }
-
-    return true;
-#   else
-    return saveError(ctx->device_id, kUnsupportedAlgorithm);
-#   endif
-}
-
-
-bool astroBWTPrepare(nvid_ctx *ctx, uint32_t batchSize)
-{
-    using namespace xmrig_cuda;
-
-#   ifdef XMRIG_ALGO_ASTROBWT
-    resetError(ctx->device_id);
-
-    try {
-#       ifdef XMRIG_ALGO_ASTROBWT
-        astrobwt_prepare(ctx, batchSize);
 #       else
         throw std::runtime_error(kUnsupportedAlgorithm);
 #       endif
@@ -395,7 +346,7 @@ bool setJob(nvid_ctx *ctx, const void *data, size_t size, uint32_t algo)
     try {
         const auto f = Algorithm::family(ctx->algorithm);
 
-        if ((f == Algorithm::RANDOM_X) || (f == Algorithm::ASTROBWT)) {
+        if (f == Algorithm::RANDOM_X) {
             cuda_extra_cpu_set_data(ctx, data, size);
         }
         else {
@@ -483,9 +434,6 @@ int32_t deviceInt(nvid_ctx *ctx, DeviceProperty property)
 
     case DeviceDatasetHost:
         return ctx->rx_dataset_host;
-
-    case DeviceAstroBWTProcessedHashes:
-        return static_cast<int32_t>(ctx->astrobwt_processed_hashes);
 
     default:
         break;
@@ -600,16 +548,6 @@ void release(nvid_ctx *ctx)
     cudaFree(ctx->d_rx_entropy);
     cudaFree(ctx->d_rx_vm_states);
     cudaFree(ctx->d_rx_rounding);
-
-    cudaFree(ctx->astrobwt_salsa20_keys);
-    cudaFree(ctx->astrobwt_bwt_data);
-    cudaFree(ctx->astrobwt_bwt_data_sizes);
-    cudaFree(ctx->astrobwt_indices);
-    cudaFree(ctx->astrobwt_tmp_indices);
-    cudaFree(ctx->astrobwt_filtered_hashes);
-    cudaFree(ctx->astrobwt_shares);
-    cudaFree(ctx->astrobwt_offsets_begin);
-    cudaFree(ctx->astrobwt_offsets_end);
 
 #   ifdef WITH_KAWPOW
     cudaFree(ctx->kawpow_cache);

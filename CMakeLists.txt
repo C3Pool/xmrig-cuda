@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5)
 project(xmrig-cuda)
 include(cmake/CUDA-Version.cmake)
 
@@ -15,13 +15,11 @@ option(WITH_CN_GPU     "Enable CryptoNight-GPU algorithm" ON)
 option(WITH_ARGON2     "Enable Argon2 algorithms family" OFF) #unsupported
 
 if (CUDA_VERSION VERSION_LESS 9.0)
-    message(STATUS "CUDA ${CUDA_VERSION}: RandomX, AstroBWT, and KawPow disabled, they do not work with old CUDA")
+    message(STATUS "CUDA ${CUDA_VERSION}: RandomX and KawPow disabled, they do not work with old CUDA")
     option(WITH_RANDOMX  "Enable RandomX algorithms family" OFF)
-    option(WITH_ASTROBWT "Enable AstroBWT algorithms family" OFF)
     option(WITH_KAWPOW   "Enable KawPow algorithms family" OFF)
 else()
     option(WITH_RANDOMX  "Enable RandomX algorithms family" ON)
-    option(WITH_ASTROBWT "Enable AstroBWT algorithms family" ON)
     option(WITH_KAWPOW   "Enable KawPow algorithms family" ON)
 endif()
 
@@ -51,10 +49,6 @@ endif()
 
 if (WITH_ARGON2)
     add_definitions(/DXMRIG_ALGO_ARGON2)
-endif()
-
-if (WITH_ASTROBWT)
-    add_definitions(/DXMRIG_ALGO_ASTROBWT)
 endif()
 
 if (WITH_KAWPOW)

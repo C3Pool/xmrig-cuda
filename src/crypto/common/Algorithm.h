@@ -61,10 +61,10 @@ public:
         RX_GRAFT        = 0x72151267,   // "rx/graft"         RandomGRAFT (Graft).
         RX_SFX          = 0x72151273,   // "rx/sfx"           RandomSFX (Safex Cash).
         RX_KEVA         = 0x7214116b,   // "rx/keva"          RandomKEVA (Keva).
+        RX_YADA         = 0x72151279,   // "rx/yada"          RandomYada (YadaCoin).
         AR2_CHUKWA      = 0x61130000,   // "argon2/chukwa"    Argon2id (Chukwa).
         AR2_CHUKWA_V2   = 0x61140000,   // "argon2/chukwav2"  Argon2id (Chukwa v2).
         AR2_WRKZ        = 0x61120000,   // "argon2/wrkz"      Argon2id (WRKZ)
-        ASTROBWT_DERO   = 0x41000000,   // "astrobwt"         AstroBWT (Dero)
         KAWPOW_RVN      = 0x6b0f0000,   // "kawpow/rvn"       KawPow (RVN)
 
         RX_XLA          = 0x721211ff,   // "panthera"         Panthera (Scala2).
@@ -80,7 +80,6 @@ public:
         CN_FEMTO        = 0x63110000,
         RANDOM_X        = 0x72000000,
         ARGON2          = 0x61000000,
-        ASTROBWT        = 0x41000000,
         KAWPOW          = 0x6b000000
     };
 
@@ -100,17 +99,9 @@ public:
     inline Id base() const                                  { return base(m_id); }
     inline Id id() const                                    { return m_id; }
     inline size_t l2() const                                { return l2(m_id); }
+    inline size_t l3() const                                { return l3(m_id); }
     inline uint32_t family() const                          { return family(m_id); }
     inline uint32_t maxIntensity() const                    { return isCN() ? 5 : 1; };
-
-    inline size_t l3() const
-    {
-#       ifdef XMRIG_ALGO_ASTROBWT
-        return m_id != ASTROBWT_DERO ? l3(m_id) : 0x100000 * 20;
-#       else
-        return l3(m_id);
-#       endif
-    }
 
     inline bool operator!=(Algorithm::Id id) const          { return m_id != id; }
     inline bool operator!=(const Algorithm &other) const    { return !isEqual(other); }

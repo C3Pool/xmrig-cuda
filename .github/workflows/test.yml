@@ -3,19 +3,19 @@ on: push
 name: Test builds
 
 jobs:
-  build_win_cuda11_3:
-    name: Windows CUDA 11.3
-    runs-on: windows-latest
+  build_win_cuda11_4:
+    name: Windows CUDA 11.4
+    runs-on: windows-2019
     steps:
       - name: Checkout code
         uses: actions/checkout@master
       - name: Install CUDA
         run: |
-          powershell -Command "Invoke-WebRequest https://developer.download.nvidia.com/compute/cuda/11.3.0/network_installers/cuda_11.3.0_win10_network.exe -OutFile .\cuda_setup.exe"
+          powershell -Command "Invoke-WebRequest https://developer.download.nvidia.com/compute/cuda/11.4.0/network_installers/cuda_11.4.0_win10_network.exe -OutFile .\cuda_setup.exe"
           start /wait .\cuda_setup.exe -s
         shell: cmd
       - name: Build project on Windows
         run: |
-          cmake . -G "Visual Studio 16 2019" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.3"
+          cmake . -G "Visual Studio 16 2019" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4"
           cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
           .\MSBuild.exe /p:Configuration=Release $Env:GITHUB_WORKSPACE\xmrig-cuda.sln || exit 1

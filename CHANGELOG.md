@@ -1,3 +1,23 @@
+# v6.22.0
+- [#201](https://github.com/xmrig/xmrig-cuda/pull/201) Added support for [Yada](https://yadacoin.io/) (`rx/yada` algorithm).
+
+# v6.21.1
+- The binary downloads now only support the latest version of each major CUDA release.
+- Improved build speed with CUDA 11.3 or higher.
+
+# v6.21.0
+- [#167](https://github.com/xmrig/xmrig-cuda/pull/167) Removed deprecated AstroBWTv1 and v2.
+- [#176](https://github.com/xmrig/xmrig-cuda/pull/176) Added CUDA 12 support.
+- [#191](https://github.com/xmrig/xmrig-cuda/pull/191) Fixed Zephyr mining.
+
+# v6.17.0
+- [#157](https://github.com/xmrig/xmrig-cuda/pull/157) Added Dero HE (`astrobwt/v2`) support.
+
+# v6.15.1
+- [#119](https://github.com/xmrig/xmrig-cuda/issues/119) Fixed compile error on Linux.
+- [#124](https://github.com/xmrig/xmrig-cuda/pull/124) Fixed `"out of memory"` error on non-CryptoNight algorithms.
+- [#125](https://github.com/xmrig/xmrig-cuda/pull/125) Fixed `"invalid argument"` error.
+
 # v6.15.0
 - **ABI changed, minimum supported XMRig version now is 6.15.0.**
 - [#2563](https://github.com/xmrig/xmrig/pull/2563) Added new algorithm RandomX Graft (`rx/graft`).
