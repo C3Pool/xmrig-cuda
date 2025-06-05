@@ -252,6 +252,31 @@ bool rxPrepare(nvid_ctx *ctx, const void *dataset, size_t datasetSize, bool, uin
 }
 
 
+bool rxUpdateDataset(nvid_ctx* ctx, const void* dataset, size_t datasetSize)
+{
+    if (ctx->rx_dataset_host > 0) {
+        return true;
+    }
+
+    using namespace xmrig_cuda;
+
+#   ifdef XMRIG_ALGO_RANDOMX
+    resetError(ctx->device_id);
+
+    try {
+        randomx_update_dataset(ctx, dataset, datasetSize);
+    }
+    catch (std::exception& ex) {
+        return saveError(ctx->device_id, ex);
+    }
+
+    return true;
+#   else
+    return saveError(ctx->device_id, kUnsupportedAlgorithm);
+#   endif
+}
+
+
 bool kawPowHash(nvid_ctx *ctx, uint8_t* job_blob, uint64_t target, uint32_t *rescount, uint32_t *resnonce, uint32_t *skipped_hashes)
 {
     using namespace xmrig_cuda;

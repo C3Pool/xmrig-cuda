@@ -46,3 +46,13 @@ void randomx_prepare(nvid_ctx *ctx, const void *dataset, size_t dataset_size, ui
     CUDA_CHECK(ctx->device_id, cudaMalloc(&ctx->d_rx_vm_states, batch_size * 2560));
     CUDA_CHECK(ctx->device_id, cudaMalloc(&ctx->d_rx_rounding, batch_size * sizeof(uint32_t)));
 }
+
+
+void randomx_update_dataset(nvid_ctx* ctx, const void* dataset, size_t dataset_size)
+{
+    if (ctx->rx_dataset_host > 0) {
+        return;
+    }
+
+    CUDA_CHECK(ctx->device_id, cudaMemcpy(ctx->d_rx_dataset, dataset, dataset_size, cudaMemcpyHostToDevice));
+}

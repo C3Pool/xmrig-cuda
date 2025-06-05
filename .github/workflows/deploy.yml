@@ -26,7 +26,7 @@ jobs:
           copy Release\*.dll .
           7z a -tzip -mx cuda11_4.zip *.dll
       - name: Upload Windows build artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: cuda11_4
           path: cuda11_4.zip
@@ -51,7 +51,7 @@ jobs:
           copy Release\*.dll .
           7z a -tzip -mx cuda11_3.zip *.dll
       - name: Upload Windows build artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: cuda11_3
           path: cuda11_3.zip
@@ -76,7 +76,7 @@ jobs:
           copy Release\*.dll .
           7z a -tzip -mx cuda11_0.zip *.dll
       - name: Upload Windows build artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: cuda11_0
           path: cuda11_0.zip
@@ -101,7 +101,7 @@ jobs:
           copy Release\*.dll .
           7z a -tzip -mx cuda10_2.zip *.dll
       - name: Upload Windows build artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: cuda10_2
           path: cuda10_2.zip
@@ -126,7 +126,7 @@ jobs:
           copy Release\*.dll .
           7z a -tzip -mx cuda10_1.zip *.dll
       - name: Upload Windows build artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: cuda10_1
           path: cuda10_1.zip
@@ -151,23 +151,23 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF:10}
 
       - name: Download Windows CUDA 11.4 build artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: cuda11_4
       - name: Download Windows CUDA 11.3 build artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: cuda11_3
       - name: Download Windows CUDA 11.0 build artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: cuda11_0
       - name: Download Windows CUDA 10.2 build artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: cuda10_2
       - name: Download Windows CUDA 10.1 build artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: cuda10_1
 

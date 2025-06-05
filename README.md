@@ -2,8 +2,8 @@
 This repository contains the CUDA plugin for the XMRig miner, which provides support for NVIDIA GPUs.
 
 This plugin is a separate project because of the main reasons listed below:
-1. Not all users require CUDA support, and it is an optional feature.
-2. CUDA has strict compiler version requirements that may conflict with the CPU mining code. For example, CUDA doesn't support GCC on Windows.
+1. Not all users need CUDA support, and it is an optional feature.
+2. CUDA has strict compiler version requirements that may be difficult to meet, unlike CPU mining code, which is generally very flexible.
 
 
 ## Windows

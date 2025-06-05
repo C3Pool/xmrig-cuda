@@ -1,3 +1,6 @@
+# v6.22.1
+- [#205](https://github.com/xmrig/xmrig-cuda/pull/205) Fixed RandomX dataset update. Fix works together with the updated XMRig.
+
 # v6.22.0
 - [#201](https://github.com/xmrig/xmrig-cuda/pull/201) Added support for [Yada](https://yadacoin.io/) (`rx/yada` algorithm).
 
